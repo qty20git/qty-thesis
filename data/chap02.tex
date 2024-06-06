@@ -23,6 +23,7 @@
 第三步通过叠氮参与的1,3-偶极环加成反应生成相应的最终产物或前驱体，由于环加成反应过程中的极性中心处于优势区位，因此通常可以与亲核水解胺化等反应串联或一锅进行，是常见的有机连续合成策略。针对环加成过程，有两种反应机理，分别对应炔烃和烯醇类似底物，后者包含N-O的次级轨道相互作用，增强了烯醇类似底物的化学活性，因此拓展了反应的搜索空间\cite{paz2018}。图\ref{fig:superstructure}中对第三步反应的转化过程做了更详细的展示，共13种纳入考虑的合成路径。第三步中涉及的各个反应工艺的定制化都较强，在模型的数据准备中分别做了相应的考虑和计算，这为超结构模型的建立带来了形式上的统一。
 
 \section{模型优化目标及约束}
+\label{section:model}
 \subsection{模型假设}
 
 在建立超结构设计模型时，本文做出如下假设，在不失模型效力和不违背生产规律的前提下帮助模型尽可能得到有益的简化。
@@ -59,7 +60,7 @@
 
 第三，操作成本（Operational Expenditure，$\symbfup{OE}$），如式\eqref{eq:oe}。操作成本项考虑了溶剂分离和处理操作的成本与电加热设备的能量消耗对应的公用工程支出，此处我们参考\cite{diab2018}的工作，按照系数折算法\cite{garrett2012}对两项成本进行估算，目的是为了考虑各个路径工艺选择在操作成本上的影响，以达到综合经济与环境因素影响的评估。
 \begin{align}
-  \symbfup{OE} = \sum_s \big(\xi\symbfit\tau_s(T_s-T_0)\symbfit N_s\symbfit L_s +E_{\rm rec}(1-r_{rec})\symbfit N_s\symbfit L_s\symbfit V_s\big) \label{eq:oe}
+  \symbfup{OE} = \sum_s \big(\xi\symbfit\tau_s(T_s-T_0)\symbfit N_s\symbfit L_s +E_{\rm rec}(1-r_{\rm rec})\symbfit N_s\symbfit L_s\symbfit V_s\big) \label{eq:oe}
 \end{align}
 其中各参数符号含义见表\ref{tab:notation}，详细的计算方法在\ref{section:shebei}节中阐述。
 
@@ -76,9 +77,28 @@
 \subsection{设备设计}
 \label{section:shebei}
 
+设备设计是本模型第二阶段的重要决策问题，主要问题在于规划合适的流动微反应器设备数量从而达到生产要求。流动微反应器因为拥有更强的传质传热能力，相比间歇反应的生产设备耗费人力更少，容易控制稳定的产品，而且也从某种程度上降低了设备占用规划、排班的设计难度，便于管理。对于一台流动反应设备，在给定的反应动力学和产物转化率的情况下，可以根据式\eqref{eq:lhsv}定义设备的液时空速$\symbfup {LHSV}$。
+\begin{align}
+  \symbfup{LHSV} = \left(\int_{X_{\rm in}}^{X_{\rm out}}\frac{\mathrm{d}X}{-\mathcal{r}_{\rm reaction}}\right)^{-1} \label{eq:lhsv}
+\end{align}
+式中$X_{\rm in}$和$X_{\rm out}$表示进入反应器与流出反应器的产物B浓度占投料A浓度的比率，$-\mathcal{r}_{\rm reaction}$表示由A生成B的动力学速率。其意义代表单位小时内被流动微反应器所处理的反应体系的总体积占反应器体积的比率。因此，对于模型中任一阶段反应的反应器操作体积为$\symbfit V_s$，操作时间为$t_{\rm opr}$，由相应的液时空速数据可以得到反应器设备与产能的关系为：
+\begin{align}
+  X_s = \symbfup{LHSV}_s\times\symbfit N_s\symbfit V_s\times t_{\rm{opr},s} \label{eq:equip1}
+\end{align}
+
+但是，在概念设计模型中，受到不同工艺的流程和后续处理差异较大的影响，$t_{\rm opr}$难以直接作为参数或变量出现。$\symbfup{LHSV}$是一个和操作条件、本征反应动力学、流动状态和催化剂填充状态相关的量，除了直接实验测定以外较难有精确的理论预测方式，因此，在设备设计部分我们采用如下的思路，通过文献的数据规模下的反推我们可以得出在一个操作步骤的总时长$\symbfit \tau_s$下产品的质量，由此我们定义“质量空速”（$\symbfup{SV}_s$）为单位操作总时长下获得产品的质量，并定义新的决策变量$\symbfit L_s=\frac{t_{\rm{opr},s}}{\tau_s}$表示单套设备的处理量，因此设备与产能之间的关联式由式\eqref{eq:equip1}转化为\eqref{eq:equip2}，即：
+\begin{align}
+  X_sM_{\rm ruf} = \symbfup{SV}_s\times\symbfit N_s\symbfit V_s\symbfit L_s\symbfit\tau_{s} \label{eq:equip2}
+\end{align}
+并将式\eqref{eq:equip2}中的参数合并定义为新的参数$\symbfup{SC}_s = \symbfup{SV}_s\symbfit V_s\symbfit\tau_{s}$。基于以上变量和参数的规定，达到生产要求的约束可以由操作时间导出：
+\begin{align}
+  \max\left\{\sum_{i\in\mathbb I}\symbfit L_i\symbfit\tau_i,\sum_{j\in\mathbb J}\symbfit L_j\symbfit\tau_j,\sum_{k\in\mathbb K}\symbfit L_k\symbfit\tau_k\right\} \le \tau^U
+\end{align}
+$\tau^U$是一个新的超参数，表示设备处在正常连续生产状态的总时间上限。
+
 \section{逻辑约束}
 
-超结构优化中的逻辑约束通常引入与决策维度相关的二元变量向量或矩阵来描述，最直观的一种表述就是“某个选项被选中/不被选中”分别对应二元变量“$\symbfit Y=1$/$\symbfit Y=0$”。对于本文模型，由于不需要类似STN网络中涉及多个任务类型的选取和转化，而是结构化地选取各步骤工艺路径，因此逻辑约束相对简单，如式\eqref{eq:lc1}-\eqref{eq:lc2}。其中$\symbfup M=10^5$为一个足够大的常量
+超结构优化中的逻辑约束通常引入与决策维度相关的二元变量向量或矩阵来描述，最直观的一种表述就是“某个选项被选中/不被选中”分别对应二元变量“$\symbfit Y=1$/$\symbfit Y=0$”。对于本文模型，由于不需要类似STN网络中涉及多个任务类型的选取和转化，而是结构化地选取各步骤工艺路径，因此逻辑约束相对简单，如式\eqref{eq:lc1}-\eqref{eq:lc2}。其中$\symbfup M=10^5$为一个足够大的常量。
 \begin{align}
   \sum_{i\in\mathbb I}\symbfit Y_i&=1 \label{eq:lc1} \\
   \sum_{j\in\mathbb J}\symbfit Y_j&=1 \\ 
@@ -88,6 +108,26 @@
 
 \section{确定性模型评估}
 \subsection{确定性模型}
+
+根据\ref{section:model}节的准备，本文构建的超结构优化模型的完整数学形式如式\eqref{eq:model1}-\eqref{eq:model2}所示。
+\begin{align}
+  \min_{\symbfit{X,Y,N}}\quad & \symbfup{ME} + \symbfup{CE} + \symbfup{OE} \label{eq:model1} \\
+  s.t.\ \symbfup{ME} &= \frac{\sum_{s}\symbfit c_s^T\symbfit X_s}{M_{\rm ruf}} \\
+   \symbfup{CE} &= \frac{\epsilon CE_0}{80.00}\sum_{s}\symbfit N_s\symbfit V_s \\
+   \symbfup{OE} &= \sum_s \big(\xi\symbfit\tau_s(T_s-T_0)\symbfit N_s\symbfit L_s +E_{\rm rec}(1-r_{\rm rec})\symbfit N_s\symbfit L_s\symbfit V_s\big) \\
+   X_sM_{\rm ruf} &= \symbfup{SV}_s\times\symbfit N_s\symbfit V_s\symbfit L_s\symbfit\tau_{s} \\
+   &\symbfit X_0\sum_{i\in\mathbb I}\symbfit Y_i\symbfit r_i=\sum_{i\in\mathbb I}\symbfit X_i \\
+  \sum_{i\in\mathbb I}&\symbfit X_i\sum_{j\in\mathbb J}\symbfit Y_j\symbfit r_j=\sum_{j\in\mathbb J}\symbfit X_j \\
+  \sum_{j\in\mathbb J}&\symbfit X_j\sum_{k\in\mathbb K}\symbfit Y_k\symbfit r_k=\sum_{i\in\mathbb K}\symbfit X_k \\
+  \sum_{k\in\mathbb K}&\symbfit X_kM_{\rm ruf}\ge PT \\
+  \max&\left\{\sum_{i\in\mathbb I}\symbfit L_i\symbfit\tau_i,\sum_{j\in\mathbb J}\symbfit L_j\symbfit\tau_j,\sum_{k\in\mathbb K}\symbfit L_k\symbfit\tau_k\right\} \le \tau^U \\
+  \sum_{i\in\mathbb I}\symbfit Y_i&=1  \\
+  \sum_{j\in\mathbb J}\symbfit Y_j&=1 \\ 
+  \sum_{k\in\mathbb K}\symbfit Y_k&=1 \\
+  \symbfit X_s &\le \symbfup M\symbfit Y_s,\ \forall s\in \mathbb S = \mathbb I \cup\mathbb J\cup\mathbb K \label{eq:model2}
+\end{align}
+
+确定性模型包含连续变量126个，二元变量29个，整数变量29个，是一个MINLP模型。模型中各符号的含义整理在表\ref{tab:notation}中。
 
 \begin{longtable}{cc}
   \caption{本文超结构优化模型的符号释义表}
@@ -103,163 +143,281 @@
 \endhead
   \bottomrule
 \endfoot
-Row 1  & & & \\
-Row 2  & & & \\
-Row 3  & & & \\
-Row 4  & & & \\
-Row 5  & & & \\
-Row 6  & & & \\
-Row 7  & & & \\
-Row 8  & & & \\
-Row 9  & & & \\
-Row 10 & & & \\
+$\mathbb I$ & 第一步反应路径选择的下标集合 \\
+$\mathbb J$ & 第二步反应路径选择的下标集合 \\
+$\mathbb K$ & 第三步反应路径选择的下标集合 \\
+$\mathbb S$ & 所有反应路径选择的下标集合 \\
+$\symbfit c_s$ & 某路径单位摩尔产物的物料价格因子 \\
+$\symbfit V_s$ & 某路径选用设备的操作容积 \\
+$\symbfit\tau_s$ & 某路径得到单位质量的该步产物所需操作的时间\\
+$\symbfit r_s$ & 某路径投料转化为产品纯品的表观转化率\\
+$T_s$ &  某路径的操作温度\\
+$M_{\rm ruf}$ & 卢非酰胺分子的摩尔质量\\
+$\epsilon$ &  流动微反应器设备的年平均折旧率\\
+$\symbfup{SV}_s$ & 某路径下采用流动反应的“质量空速” （详细定义见\ref{section:shebei}节）\\
+$CE_0$ & 标准单套设备投资\\
+$E_{\rm rec}$ & 单位体积的溶剂消耗支出\\
+$r_{\rm rec}$ & 溶剂回收率\\
+$\xi$ & 公用工程成本折算系数\\
+$T_0$ & 操作环境的室温\\
+$\tau^U$ & 一年内设备处于正常生产状态的总时间上限\\
+$PT$ & 一年内卢非酰胺的生产目标（按质量计）\\
+$\symbfit X_0$ & 二氟苯甲醇前驱体的总需求量（以摩尔数计）\\
+$\symbfit X_i$ & 第一步骤产品的预期总产能（以摩尔数计）\\
+$\symbfit X_j$ & 第二步骤产品的预期总产能（以摩尔数计）\\
+$\symbfit X_k$ & 第三步骤产品的预期总产能（以摩尔数计）\\
+$\symbfit Y_s$ & 某路径是否选择的决策变量\\
+$\symbfit N_s$ & 某路径选择下需要的设备数量\\
+$\symbfit L_s$ & 某路径下流动反应器的年生产能力（详细定义见\ref{section:shebei}节）\\
 \end{longtable}
 
 \subsection{确定性模型求解结果}
 
-\section{不确定性优化模型}
-\subsection{灵敏度分析与不确定参数选取}
-\subsection{鲁棒优化模型}
-\subsection{两阶段ARO模型建立}
+本节中对确定性模型\eqref{eq:model1}-\eqref{eq:model2}的求解采用GAMS 34.2.0编写程序并用BARON求解器\cite{kilinc2018}求解，计算所用个人电脑的配置资源如下：处理器型号Intel® CoreTM i7-10175H（基准速度2.59GHz）, 内存16GB，采用全部线程求解。
 
+确定性模型采用的超参数标称点（Nominal Point）的值分别为：年生产目标$PT=100$kg，生产时间上限$\tau^U=7000$h，公用工程成本折算系数$\xi=4.525\times10^{-1}$，标称点参数的选取参考了以往发表的相关市场分析，模型与评估工作\cite{diab2018, padmaja2018}，求解得到了确定性模型下成本最优的卢非酰胺连续合成路线：第一步反应采用溴化氢作为卤代试剂，第二步采用了无溶剂策略的重氮化反应\cite{gelonch2019}，第三步反应采用了以DMSO为有机溶剂体系下的热催化Huisgen环加成反应。具体的路径结构采用红色高亮标注在图\ref{fig:deterministic}中。
 
-\section{插图}
-
-图片通常在 \env{figure} 环境中使用 \cs{includegraphics} 插入，如图~\ref{fig:example} 的源代码。
-建议矢量图片使用 PDF 格式，比如数据可视化的绘图；
-照片应使用 JPG 格式；
-其他的栅格图应使用无损的 PNG 格式。
-注意，LaTeX 不支持 TIFF 格式；EPS 格式已经过时。
-
-\begin{figure}
+\begin{figure}[ht!]
   \centering
-  \includegraphics[width=0.5\linewidth]{example-image-a.pdf}
-  \caption*{国外的期刊习惯将图表的标题和说明文字写成一段，需要改写为标题只含图表的名称，其他说明文字以注释方式写在图表下方，或者写在正文中。}
-  \caption{示例图片标题}
-  \label{fig:example}
+  \includegraphics[width=1.1\linewidth]{deterministic.png}
+  \caption{确定性模型最优超结构路径选择图示}
+  \label{fig:deterministic}
 \end{figure}
 
-若图或表中有附注，采用英文小写字母顺序编号，附注写在图或表的下方。
-国外的期刊习惯将图表的标题和说明文字写成一段，需要改写为标题只含图表的名称，其他说明文字以注释方式写在图表下方，或者写在正文中。
+确定性模型的求解结果总结在下面表\ref{tab:deterministic}中。将目标函数中$\symbfup{ME}$、$\symbfup{CE}$及$\symbfup{OE}$的两项的计算结果用饼图\ref{fig:composition}表示，与已发表的关于卢非酰胺合成过程的经济评估的文献\cite{diab2018}进行对比，可以进一步验证模型的合理性。
 
-如果一个图由两个或两个以上分图组成时，各分图分别以 (a)、(b)、(c)...... 作为图序，并须有分图题。
-推荐使用 \pkg{subcaption} 宏包来处理， 比如图~\ref{fig:subfig-a} 和图~\ref{fig:subfig-b}。
-
-\begin{figure}
+\begin{figure}[ht!]
   \centering
-  \subcaptionbox{分图 A\label{fig:subfig-a}}
-    {\includegraphics[width=0.35\linewidth]{example-image-a.pdf}}
-  \subcaptionbox{分图 B\label{fig:subfig-b}}
-    {\includegraphics[width=0.35\linewidth]{example-image-b.pdf}}
-  \caption{多个分图的示例}
-  \label{fig:multi-image}
+  \includegraphics[width=12cm]{composition.png}
+  \caption{确定性模型最优决策下成本函数的构成}
+  \label{fig:composition}
 \end{figure}
 
-
-
-\section{表格}
-
-表应具有自明性。为使表格简洁易读，尽可能采用三线表，如表~\ref{tab:three-line}。
-三条线可以使用 \pkg{booktabs} 宏包提供的命令生成。
-
-\begin{table}
-  \centering
-  \caption{三线表示例}
-  \begin{tabular}{ll}
-    \toprule
-    文件名          & 描述                         \\
-    \midrule
-    thuthesis.dtx   & 模板的源文件，包括文档和注释 \\
-    thuthesis.cls   & 模板文件                     \\
-    thuthesis-*.bst & BibTeX 参考文献表样式文件    \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:three-line}
-\end{table}
-
-表格如果有附注，尤其是需要在表格中进行标注时，可以使用 \pkg{threeparttable} 宏包。
-研究生要求使用英文小写字母 a、b、c……顺序编号，本科生使用圈码 ①、②、③……编号。
-
-\begin{table}
+\begin{table}[ht!]
   \centering
   \begin{threeparttable}[c]
-    \caption{带附注的表格示例}
-    \label{tab:three-part-table}
-    \begin{tabular}{ll}
+    \caption{卢非酰胺连续合成超结构确定性模型优化结果}
+    \label{tab:deterministic}
+    \begin{tabular}{cccccc}
       \toprule
-      文件名                 & 描述                         \\
+       & 路径\tnote{1} & 设备需求量$\symbfit N_s$ & 总产量（$\symbfit X_s$/mol） & 总产能\tnote{2}（kg）& 目标函数值（美元/年） \\
       \midrule
-      thuthesis.dtx\tnote{a} & 模板的源文件，包括文档和注释 \\
-      thuthesis.cls\tnote{b} & 模板文件                     \\
-      thuthesis-*.bst        & BibTeX 参考文献表样式文件    \\
+      步骤一 & 2   &  4   &  360.36	 &  74.60   &  \multirow[c]{3}{*}{$7.818\times 10^6$} \\
+      步骤二 & 6   &  2   &  360.33	 &  60.93   & \\
+      步骤三 & 6   &  32  &  353.12	 &  100.00  & \\
       \bottomrule
     \end{tabular}
     \begin{tablenotes}
-      \item [a] 可以通过 xelatex 编译生成模板的使用说明文档；
-        使用 xetex 编译 \file{thuthesis.ins} 时则会从 \file{.dtx} 中去除掉文档和注释，得到精简的 \file{.cls} 文件。
-      \item [b] 更新模板时，一定要记得编译生成 \file{.cls} 文件，否则编译论文时载入的依然是旧版的模板。
+      \item [1] 此处的数字表示各步骤备选路径所对应集合$\mathbb{I,J,K}$的下标$i,j,k$，后文中也用类似“2-6-6”的表述指代特定的路径决策组合。
+      \item [2] 总产能即指当前路径设计下一年的生产周期内每个步骤预计产出的产品质量。
     \end{tablenotes}
   \end{threeparttable}
 \end{table}
 
-如某个表需要转页接排，可以使用 \pkg{longtable} 宏包，需要在随后的各页上重复表的编号。
-编号后跟表题（可省略）和“（续）”，置于表上方。续表均应重复表头。
+确定性模型的问题规模由表\ref{tab:problemscale}给出，该问题规模对于后续不确定性模型的构建有重要的影响。如果确定性模型问题规模过大，则会超出目前通用求解器所采用算法的上限，这是由于大规模问题的迭代算法的求解仍然是一个尚未完全解决的难题。
 
-\begin{longtable}{cccc}
-    \caption{跨页长表格的表题}
-    \label{tab:longtable} \\
+\begin{table}[ht!]
+  \centering
+  \caption{超结构优化确定性模型问题规模}
+  \begin{tabular}{cccc}
     \toprule
-    表头 1 & 表头 2 & 表头 3 & 表头 4 \\
+    约束数量         & 单变量个数   &  非零变量个数   &  离散变量个数  \\
     \midrule
-  \endfirsthead
-    \caption*{续表~\thetable\quad 跨页长表格的表题} \\
-    \toprule
-    表头 1 & 表头 2 & 表头 3 & 表头 4 \\
-    \midrule
-  \endhead
+    141   & 125  &   497  &   58 \\
     \bottomrule
-  \endfoot
-  Row 1  & & & \\
-  Row 2  & & & \\
-  Row 3  & & & \\
-  Row 4  & & & \\
-  Row 5  & & & \\
-  Row 6  & & & \\
-  Row 7  & & & \\
-  Row 8  & & & \\
-  Row 9  & & & \\
-  Row 10 & & & \\
-\end{longtable}
+  \end{tabular}
+  \label{tab:problemscale}
+\end{table}
+
+\section{不确定性优化模型}
+
+不确定优化模型的构建是本文研究的重点，合理的不确定优化模型需要仔细考虑不确定因素的来源和参数化描述，不确定参数的集合表示形式与模型嵌入方式，然后选取合适的不确定优化决策模型。在本文构建的两阶段模型中，不确定参数主要来自生产规划的早期概念设计阶段，因此我们筛选路径阶段的决策主要来自于对具有表现出最大生产灵活性潜力的工艺路径的确定。然而，生产场景的不确定性直接关系到路径确定下过程设计决策的约束，因此需要根据不确定性的实现情况进行调整，在这个意义上，设计阶段自然成为第二阶段决策。因此，本文认为基于超结构优化模型的连续合成制备高附加值化学品的工艺综合与概念设计工作同两阶段的ARO框架有深远的一致性，两者分别是化学工业学科的研究场景与不确定优化方法的研究场景，其本质关联值得进一步探索。
+
+\subsection{灵敏度分析与不确定参数选取}
+
+模型对参数的灵敏度分析通常指通过在一定步长下逐参数选择地绘制模型输出对参数变化的响应特性，来发现特定参数对模型表现的影响，这在不确定性分析、模型诊断或基于信赖域的优化方法领域均有重要应用。对于确定性模型的超参数灵敏度分析主要通过对超参数进行赋值并求解出各个参数值下对应的最优路径和目标函数值。伴随着最优路径的变化，目标函数值对参数值的响应曲线呈现出拐点。
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.1\linewidth]{xi.png}
+  \caption{对超参数$\xi$的灵敏度分析示意图}
+  \label{fig:xi}
+\end{figure}
+
+首先，在模型求解时固定确定性模型最优结构决策组合2-6-6，对于年生产目标$PT$超参数从50到600按步长为10依次取值，求解得到最优的目标函数随$PT$的变化曲线如图\ref{fig:pt}所示，可以看出，当前路径最大年生产能力可以达到550kg，这与已有文献\cite{gelonch2019}接近。取消对结构决策变量的固定取值，可以得到不同的年生产目标对应的最优路径选取也不同。另一个典型的例子是公用工程成本折算系数$\xi$，在标称点附近的波动范围内存在两个临界点。在$\xi\in\left[0.428,0.489\right]$范围内以$10^{-3}$为步长进行灵敏度分析，如图\ref{fig:xi}所示，在$\xi<0.456$时最优路径决策组合为2-6-6，当$0.456\le\xi<0.485$时最优解变为2-6-8，当$\xi\ge0.485$时变为2-6-9。
+
+在最终的超结构不确定优化模型中，综合考虑灵敏度分析结果与参数意义，选取了$PT$、$\tau^U$和$\xi$三个不确定参数作为建立模型的基础。其中，考虑市场需求的不确定波动在药物等化学品制造的概念设计中经常引入\cite{pisti1995}。因此，卢非酰胺的药物API年生产目标可能会随市场预期或企业的产品结构调整而存在一定变化，然而，较大幅度的生产负荷波动在实际生产中并不现实，因此，我们考虑$PT$在$[50,150]$（kg）范围内波动。另外，考虑到新冠疫情爆发等大型公共事件对生产正常状况带来的影响，连续生产过程需要考虑由于停车、检修设备或应对突发状况而导致的生产周期缩短，因此在工艺与设备设计中往往要求一定的生产空间弹性以备预期生产目标的达成。因此，本文考虑设备正常运行的总时间上限$\tau^U$的标称值为7000小时，略低于一般生产设计中常用的8000小时惯例，而将不确定参数波动的偏差值$\increment \tau^U=1000$h。公用工程成本折算系数的不确定性主要来自于工厂选址或能源价格自身的波动等，同时可能与相关政策变化相关，但变化范围相应较小，在本文中我们选取$\increment\xi=4.5\times10^{-2}$，即标称点值的10\%。
+
+在不确定集的刻画方面，由于三个不确定变量可以认为相互独立地进行波动，因此不失一般性地采用最简单的箱型不确定集（Box uncertainty set），将标称点置于箱型不确定集的几何中心。箱型不确定集的保守程度相对较高，且最坏情况通常实现到顶点的极端情况。对于本文的模型而言，箱型不确定集的这一特性是可以接受的，且此处不确定集合的具体形式并不影响后续计算流程的有效性。
+
+
+\subsection{两阶段ARO模型建立}
+
+确定了不确定集之后，可以根据传统的SRO框架构建最基础的不确定优化模型，如式\eqref{eq:romodel1}-\eqref{eq:romodel2}所示。
+
+\begin{align}
+  \min_{\symbfit{X,Y,N}}\ \max_{\symbfit \Gamma} \quad & \symbfup{ME} + \symbfup{CE} + \symbfup{OE} \label{eq:romodel1} \\
+  s.t.\ \symbfup{ME} &= \frac{\sum_{s}\symbfit c_s^T\symbfit X_s}{M_{\rm ruf}} \\
+   \symbfup{CE} &= \frac{\epsilon CE_0}{80.00}\sum_{s}\symbfit N_s\symbfit V_s \\
+   \symbfup{OE} &= \sum_s \big(\xi\symbfit\tau_s(T_s-T_0)\symbfit N_s\symbfit L_s +E_{\rm rec}(1-r_{\rm rec})\symbfit N_s\symbfit L_s\symbfit V_s\big) \\
+   X_sM_{\rm ruf} &= \symbfup{SV}_s\times\symbfit N_s\symbfit V_s\symbfit L_s\symbfit\tau_{s} \\
+   &\symbfit X_0\sum_{i\in\mathbb I}\symbfit Y_i\symbfit r_i=\sum_{i\in\mathbb I}\symbfit X_i \\
+  \sum_{i\in\mathbb I}&\symbfit X_i\sum_{j\in\mathbb J}\symbfit Y_j\symbfit r_j=\sum_{j\in\mathbb J}\symbfit X_j \\
+  \sum_{j\in\mathbb J}&\symbfit X_j\sum_{k\in\mathbb K}\symbfit Y_k\symbfit r_k=\sum_{i\in\mathbb K}\symbfit X_k \\
+  \sum_{k\in\mathbb K}&\symbfit X_kM_{\rm ruf}\ge PT \\
+  \max&\left\{\sum_{i\in\mathbb I}\symbfit L_i\symbfit\tau_i,\sum_{j\in\mathbb J}\symbfit L_j\symbfit\tau_j,\sum_{k\in\mathbb K}\symbfit L_k\symbfit\tau_k\right\} \le \tau^U \\
+  \sum_{i\in\mathbb I}\symbfit Y_i&=1  \\
+  \sum_{j\in\mathbb J}\symbfit Y_j&=1 \\ 
+  \sum_{k\in\mathbb K}\symbfit Y_k&=1 \\
+  \symbfit X_s &\le \symbfup M\symbfit Y_s,\ \forall s\in \mathbb S = \mathbb I \cup\mathbb J\cup\mathbb K \\
+  PT &= PT_0 + \Gamma_1\increment PT,\ |\Gamma_1|\le 1, \Gamma_1\in\mathbb Z \\
+  \tau^U &= \tau_0^U + \Gamma_2\increment \tau^U,\ |\Gamma_2|\le 1, \Gamma_2\in\mathbb Z \\
+  \xi &= \xi_0 + \Gamma_3\increment\xi,\ |\Gamma_3|\le 1, \Gamma_3\in\mathbb Z \label{eq:romodel2}
+\end{align}
+
+其中，$PT_0=100(\mathrm{kg}), \tau^U_0 = 7000({\mathrm h}), \xi_0=4.525\times 10^{-1}$均表示标称值。然而，当前的SRO模型并没有一个好的求解框架可以让决策者通过优化设计得到应对不确定性的方案，因此，在式\eqref{eq:aro1}的启发下，我们可以将SRO模型转化为两阶段ARO模型，如式\eqref{eq:aromodel1}-\eqref{eq:aromodel2}。
+
+\begin{align}
+  \min_{\symbfit{Y}}\ 0 + \max_{\symbfit \Gamma}\ \min_{\symbfit{X,N}}\quad & \symbfup{ME} + \symbfup{CE} + \symbfup{OE} \label{eq:aromodel1} \\
+  s.t.\ \symbfup{ME} &= \frac{\sum_{s}\symbfit c_s^T\symbfit X_s}{M_{\rm ruf}} \\
+   \symbfup{CE} &= \frac{\epsilon CE_0}{80.00}\sum_{s}\symbfit N_s\symbfit V_s \\
+   \symbfup{OE} &= \sum_s \big(\xi\symbfit\tau_s(T_s-T_0)\symbfit N_s\symbfit L_s +E_{\rm rec}(1-r_{\rm rec})\symbfit N_s\symbfit L_s\symbfit V_s\big) \\
+   X_sM_{\rm ruf} &= \symbfup{SV}_s\times\symbfit N_s\symbfit V_s\symbfit L_s\symbfit\tau_{s} \\
+   &\symbfit X_0\sum_{i\in\mathbb I}\symbfit Y_i\symbfit r_i=\sum_{i\in\mathbb I}\symbfit X_i \\
+  \sum_{i\in\mathbb I}&\symbfit X_i\sum_{j\in\mathbb J}\symbfit Y_j\symbfit r_j=\sum_{j\in\mathbb J}\symbfit X_j \\
+  \sum_{j\in\mathbb J}&\symbfit X_j\sum_{k\in\mathbb K}\symbfit Y_k\symbfit r_k=\sum_{i\in\mathbb K}\symbfit X_k \\
+  \sum_{k\in\mathbb K}&\symbfit X_kM_{\rm ruf}\ge PT \\
+  \max&\left\{\sum_{i\in\mathbb I}\symbfit L_i\symbfit\tau_i,\sum_{j\in\mathbb J}\symbfit L_j\symbfit\tau_j,\sum_{k\in\mathbb K}\symbfit L_k\symbfit\tau_k\right\} \le \tau^U \\
+  \sum_{i\in\mathbb I}\symbfit Y_i&=1  \\
+  \sum_{j\in\mathbb J}\symbfit Y_j&=1 \\ 
+  \sum_{k\in\mathbb K}\symbfit Y_k&=1 \\
+  \symbfit X_s &\le \symbfup M\symbfit Y_s,\ \forall s\in \mathbb S = \mathbb I \cup\mathbb J\cup\mathbb K \\
+  PT &= PT_0 + \Gamma_1\increment PT,\ |\Gamma_1|\le 1, \Gamma_1\in\mathbb Z \\
+  \tau^U &= \tau_0^U + \Gamma_2\increment \tau^U,\ |\Gamma_2|\le 1, \Gamma_2\in\mathbb Z \\
+  \xi &= \xi_0 + \Gamma_3\increment\xi,\ |\Gamma_3|\le 1, \Gamma_3\in\mathbb Z \label{eq:aromodel2}
+\end{align}
+
+至此，模型建立的工作已经初步完成。值得注意的是，模型\eqref{eq:aromodel1}-\eqref{eq:aromodel2}的追索问题包含混合整数决策变量$\symbfit N$，因此需要设计特殊的求解流程来解决混合整数追索问题，将在第\ref{section:solution}章中详细介绍。对该两阶段ARO模型的求解也将提供本文模型的卢非酰胺连续合成过程最优设计。
+
+% 若图或表中有附注，采用英文小写字母顺序编号，附注写在图或表的下方。
+% 国外的期刊习惯将图表的标题和说明文字写成一段，需要改写为标题只含图表的名称，其他说明文字以注释方式写在图表下方，或者写在正文中。
+
+% 如果一个图由两个或两个以上分图组成时，各分图分别以 (a)、(b)、(c)...... 作为图序，并须有分图题。
+% 推荐使用 \pkg{subcaption} 宏包来处理， 比如图~\ref{fig:subfig-a} 和图~\ref{fig:subfig-b}。
+
+% \begin{figure}
+%   \centering
+%   \subcaptionbox{分图 A\label{fig:subfig-a}}
+%     {\includegraphics[width=0.35\linewidth]{example-image-a.pdf}}
+%   \subcaptionbox{分图 B\label{fig:subfig-b}}
+%     {\includegraphics[width=0.35\linewidth]{example-image-b.pdf}}
+%   \caption{多个分图的示例}
+%   \label{fig:multi-image}
+% \end{figure}
+
+% \section{表格}
+
+% 表应具有自明性。为使表格简洁易读，尽可能采用三线表，如表~\ref{tab:three-line}。
+% 三条线可以使用 \pkg{booktabs} 宏包提供的命令生成。
+
+% \begin{table}
+%   \centering
+%   \caption{三线表示例}
+%   \begin{tabular}{ll}
+%     \toprule
+%     文件名          & 描述                         \\
+%     \midrule
+%     thuthesis.dtx   & 模板的源文件，包括文档和注释 \\
+%     thuthesis.cls   & 模板文件                     \\
+%     thuthesis-*.bst & BibTeX 参考文献表样式文件    \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:three-line}
+% \end{table}
+
+% 表格如果有附注，尤其是需要在表格中进行标注时，可以使用 \pkg{threeparttable} 宏包。
+% 研究生要求使用英文小写字母 a、b、c……顺序编号，本科生使用圈码 ①、②、③……编号。
+
+% \begin{table}
+%   \centering
+%   \begin{threeparttable}[c]
+%     \caption{带附注的表格示例}
+%     \label{tab:three-part-table}
+%     \begin{tabular}{ll}
+%       \toprule
+%       文件名                 & 描述                         \\
+%       \midrule
+%       thuthesis.dtx\tnote{a} & 模板的源文件，包括文档和注释 \\
+%       thuthesis.cls\tnote{b} & 模板文件                     \\
+%       thuthesis-*.bst        & BibTeX 参考文献表样式文件    \\
+%       \bottomrule
+%     \end{tabular}
+%     \begin{tablenotes}
+%       \item [a] 可以通过 xelatex 编译生成模板的使用说明文档；
+%         使用 xetex 编译 \file{thuthesis.ins} 时则会从 \file{.dtx} 中去除掉文档和注释，得到精简的 \file{.cls} 文件。
+%       \item [b] 更新模板时，一定要记得编译生成 \file{.cls} 文件，否则编译论文时载入的依然是旧版的模板。
+%     \end{tablenotes}
+%   \end{threeparttable}
+% \end{table}
+
+% 如某个表需要转页接排，可以使用 \pkg{longtable} 宏包，需要在随后的各页上重复表的编号。
+% 编号后跟表题（可省略）和“（续）”，置于表上方。续表均应重复表头。
+
+% \begin{longtable}{cccc}
+%     \caption{跨页长表格的表题}
+%     \label{tab:longtable} \\
+%     \toprule
+%     表头 1 & 表头 2 & 表头 3 & 表头 4 \\
+%     \midrule
+%   \endfirsthead
+%     \caption*{续表~\thetable\quad 跨页长表格的表题} \\
+%     \toprule
+%     表头 1 & 表头 2 & 表头 3 & 表头 4 \\
+%     \midrule
+%   \endhead
+%     \bottomrule
+%   \endfoot
+%   Row 1  & & & \\
+%   Row 2  & & & \\
+%   Row 3  & & & \\
+%   Row 4  & & & \\
+%   Row 5  & & & \\
+%   Row 6  & & & \\
+%   Row 7  & & & \\
+%   Row 8  & & & \\
+%   Row 9  & & & \\
+%   Row 10 & & & \\
+% \end{longtable}
 
 
 
-\section{算法}
+% \section{算法}
 
-算法环境可以使用 \pkg{algorithms} 或者 \pkg{algorithm2e} 宏包。
+% 算法环境可以使用 \pkg{algorithms} 或者 \pkg{algorithm2e} 宏包。
 
-\renewcommand{\algorithmicrequire}{\textbf{输入：}\unskip}
-\renewcommand{\algorithmicensure}{\textbf{输出：}\unskip}
+% \renewcommand{\algorithmicrequire}{\textbf{输入：}\unskip}
+% \renewcommand{\algorithmicensure}{\textbf{输出：}\unskip}
 
-\begin{algorithm}
-  \caption{Calculate $y = x^n$}
-  \label{alg1}
-  \small
-  \begin{algorithmic}
-    \REQUIRE $n \geq 0$
-    \ENSURE $y = x^n$
+% \begin{algorithm}
+%   \caption{Calculate $y = x^n$}
+%   \label{alg1}
+%   \small
+%   \begin{algorithmic}
+%     \REQUIRE $n \geq 0$
+%     \ENSURE $y = x^n$
 
-    \STATE $y \leftarrow 1$
-    \STATE $X \leftarrow x$
-    \STATE $N \leftarrow n$
+%     \STATE $y \leftarrow 1$
+%     \STATE $X \leftarrow x$
+%     \STATE $N \leftarrow n$
 
-    \WHILE{$N \neq 0$}
-      \IF{$N$ is even}
-        \STATE $X \leftarrow X \times X$
-        \STATE $N \leftarrow N / 2$
-      \ELSE[$N$ is odd]
-        \STATE $y \leftarrow y \times X$
-        \STATE $N \leftarrow N - 1$
-      \ENDIF
-    \ENDWHILE
-  \end{algorithmic}
-\end{algorithm}
+%     \WHILE{$N \neq 0$}
+%       \IF{$N$ is even}
+%         \STATE $X \leftarrow X \times X$
+%         \STATE $N \leftarrow N / 2$
+%       \ELSE[$N$ is odd]
+%         \STATE $y \leftarrow y \times X$
+%         \STATE $N \leftarrow N - 1$
+%       \ENDIF
+%     \ENDWHILE
+%   \end{algorithmic}
+% \end{algorithm}

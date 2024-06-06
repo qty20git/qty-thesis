@@ -19,7 +19,7 @@
 过程综合包含流程综合（Flowsheet Synthesis）、设备网络调优、过程模拟与优化、经济评估等多个分支，通常是在基于物料与能量衡算的基础上运用适当的模型方法，在根据特定化工生产的要求和限制对可能的方案进行定量的评价与对比\cite{osti_293030}。
 在过程设计方法发展初期，为了应对多个不同子系统之间的关联结构的搜索空间（Search Space）复杂度急剧升高的问题，研究了启发式结构策略（Heuristic Structuring）\cite{masso1969}，在上世纪，启发式方法广泛应用于流程综合与公用工程网络调优这类涉及到大量子系统关联的问题\cite{papoulias1983,westerberg2004}，可以大幅度地降低搜索调优的难度，这是由于启发式方法通常可以更好地将经验知识与实际问题相结合，避免了大量盲目试验。
 
-随着大规模混合整数规划的理论发展，过程设计中的主要问题逐渐由数学规划问题所描述并取得很好的求实际效果，物料守恒、能量守恒、操作逻辑和单元系统的响应特性常常作为约束，而各类过程的决策与设计常用0-1二元变量和连续变量所描述，并构造符合设计者预期的优化目标函数。研究者先后提出了层次分解模型（Hierarchical Decomposion）和超结构综合模型（Superstructure Synthesis），后者可以更高效地应用于有大量潜在结构可供选择的情景，而更适用于包括本文研究在内的大量复杂过程设计问题\cite{westerberg2004, mencarelli2020,ryu2020}。
+随着大规模混合整数规划的理论发展，过程设计中的主要问题逐渐由数学规划问题所描述并取得很好的实际效果，物料守恒、能量守恒、操作逻辑和单元系统的响应特性常常作为约束，而各类过程的决策与设计常用0-1二元变量和连续变量所描述，并构造符合设计者预期的优化目标函数。研究者先后提出了层次分解模型（Hierarchical Decomposion）和超结构综合模型（Superstructure Synthesis），后者可以更高效地应用于有大量潜在结构可供选择的情景，而更适用于包括本文研究在内的大量复杂过程设计问题\cite{westerberg2004, mencarelli2020,ryu2020}。
 
 基于超结构综合模型的过程设计方法最早由Umeda等人提出，所谓超结构即包含一个过程系统所有可能的结构组合的选择的集合，开展具体过程设计问题的超结构优化通常遵循三步“假设——转化——求解”，即假设一个已经包含了所有纳入考虑的选择的超结构，转化为合适的数学规划模型并求解该数学规划\cite{umeda1972}，本文也将根据这样的步骤范式展开研究。
 
@@ -78,7 +78,7 @@
 
 正如在\ref{section:buqueding}节中提到的，ARO在最早提出的工作中采用了将可调变量转化为不确定参数的仿射函数的形式，即式\eqref{eq:aro2}，类似的数学结构被广泛地研究并拓展为通用的寻找ARO的近似解的方法。类似的方法的核心均为把可调变量表示为某个不确定参数的显式函数，称为“决策规则” （Decision Rule）。决策规则的选取将影响求解的效率和解的性质，并且即使在固定追索（fixed recourse）——即可调变量的系数不含有不确定性——的情形下，引入决策规则的解仍然不是原鲁棒问题的精确解。，为了求解的便利和更强的可解释性，可调鲁棒优化借鉴了多阶段随机规划的思路也形成了两阶段形式，其中第二阶段针对可调变量的最优化问题也被称为追索问题，含有追索问题的ARO的一般形式如式\eqref{eq:tsaro1}-\eqref{eq:tsaro2}所示。
  \begin{align}
-   \min_{\symbfit y} &\symbfit c^T\symbfit y + \max_{\symbfit u\in\mathbb U} \min_{\symbfit x\in \mathit F(\symbfit y, \symbfit u)} \symbfit b^T \symbfit x \label{eq:tsaro1}\\
+   \min_{\symbfit y}\quad &\symbfit c^T\symbfit y + \max_{\symbfit u\in\mathbb U} \min_{\symbfit x\in \mathit F(\symbfit y, \symbfit u)} \symbfit b^T \symbfit x \label{eq:tsaro1}\\
     s.t.\ & f(\symbfit y,\symbfit u) \le 0 \\
     & \mathit F(\symbfit y, \symbfit u) = \left\{ \symbfit x\in \mathbb S_x\right | g(\symbfit x, \symbfit y, \symbfit u) \le 0\} \label{eq:tsaro2}
  \end{align}

@@ -1,7 +1,6 @@
 $$
 \begin{align}
-    \min_{\bf{u,v,W}}\max_{\xi\in\mathbb{U}}\quad & \bf{c(\xi)}^T\left(\begin{align*}{\bf u}\\{\bf v}\end{align*}\right) \\
-    s.t.\ & \bf{Uu}+\bf{V}(\bf w + \bf{W\xi}) \le \bf b(\bf \xi) \\
-    & \bf v = \bf w + \bf{W\xi} \\
+       &\mathcal{Q}(\hat{\bf y})=\max_{\bf u\in\mathbb U}\min_{x\in\mathbb X} \bf b^T\bf x \\
+      s.t.\ & \bf G \bf x \ge \bf h - \bf E \bf \hat   - \bf M \bf u
 \end{align}
 $$
